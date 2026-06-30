@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: argocd
+  labels:
+    istio-injection: enabled
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cmd-params-cm
+  namespace: argocd
+data:
+  # Serve Argo CD UI/API on HTTP inside the mesh. TLS is handled at Istio ingress.
+  server.insecure: "true"
+  server.rootpath: "/argocd"
