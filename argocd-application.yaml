@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/sajilpb/Istio.git
     targetRevision: HEAD
-    path: Istio
+    path: Bookinfo-app
   destination:
     server: https://kubernetes.default.svc
     namespace: default
