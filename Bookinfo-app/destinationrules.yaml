@@ -54,6 +54,9 @@ spec:
   - name: v2-mysql-vm
     labels:
       version: v2-mysql-vm
+  - name: canary
+    labels:
+      version: canary
 ---
 apiVersion: networking.istio.io/v1
 kind: DestinationRule

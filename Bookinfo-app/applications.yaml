@@ -121,6 +121,10 @@ spec:
         istio:
           virtualService:
             name: ratings
+          destinationRule:
+            name: ratings
+            canarySubsetName: canary
+            stableSubsetName: v1
       steps:
       - setWeight: 20
       - pause: {duration: 5m}
@@ -138,7 +142,7 @@ spec:
       serviceAccountName: bookinfo-ratings
       containers:
       - name: ratings
-        image: registry.istio.io/release/examples-bookinfo-ratings-v1:1.20.3
+        image: registry.istio.io/release/examples-bookinfo-ratings-v2:1.20.3
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 9080
