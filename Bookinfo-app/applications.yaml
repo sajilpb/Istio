@@ -117,10 +117,12 @@ spec:
 
   strategy:
     canary:
-      trafficManagement:
+      trafficRouting:
         istio:
           virtualService:
             name: ratings
+            routes:
+            - primary
           destinationRule:
             name: ratings
             canarySubsetName: canary

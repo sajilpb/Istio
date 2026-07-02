@@ -68,11 +68,12 @@ spec:
   hosts:
   - ratings
   http:
-   - route:
-     - destination:
+  - name: primary
+    route:
+    - destination:
         host: ratings
         subset: v1
-       weight: 100
+      weight: 100
 ---
 apiVersion: networking.istio.io/v1
 kind: VirtualService
