@@ -247,8 +247,8 @@ spec:
       - name: tmp
         emptyDir: {}
 ---
-apiVersion: argoproj.io/v1alpha1
-kind: Rollout
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: reviews-v3
   labels:
