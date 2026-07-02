@@ -50,8 +50,8 @@ metadata:
   labels:
     account: details
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
 metadata:
   name: details-v1
   labels:
@@ -101,8 +101,8 @@ metadata:
   labels:
     account: ratings
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
 metadata:
   name: ratings-v1
   labels:
@@ -114,6 +114,21 @@ spec:
     matchLabels:
       app: ratings
       version: v1
+
+  strategy:
+    canary:
+      trafficManagement:
+        istio:
+          virtualService:
+            name: ratings
+      steps:
+      - setWeight: 20
+      - pause: {duration: 5m}
+      - setWeight: 50
+      - pause: {duration: 5m}
+      - setWeight: 100
+      - pause: {duration: 5m}
+
   template:
     metadata:
       labels:
@@ -232,8 +247,8 @@ spec:
       - name: tmp
         emptyDir: {}
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
 metadata:
   name: reviews-v3
   labels:
@@ -332,126 +347,7 @@ spec:
       volumes:
       - name: tmp
         emptyDir: {}
----
 
-# Destination rules
-
-apiVersion: networking.istio.io/v1
-kind: DestinationRule
-metadata:
-  name: productpage
-spec:
-  host: productpage
-  trafficPolicy:
-    tls:
-      mode: ISTIO_MUTUAL
-  subsets:
-  - name: v1
-    labels:
-      version: v1
----
-apiVersion: networking.istio.io/v1
-kind: DestinationRule
-metadata:
-  name: reviews
-spec:
-  host: reviews
-  trafficPolicy:
-    tls:
-      mode: ISTIO_MUTUAL
-  subsets:
-  - name: v1
-    labels:
-      version: v1
-  - name: v2
-    labels:
-      version: v2
-  - name: v3
-    labels:
-      version: v3
----
-apiVersion: networking.istio.io/v1
-kind: DestinationRule
-metadata:
-  name: ratings
-spec:
-  host: ratings
-  trafficPolicy:
-    tls:
-      mode: ISTIO_MUTUAL
-  subsets:
-  - name: v1
-    labels:
-      version: v1
-  - name: v2
-    labels:
-      version: v2
-  - name: v2-mysql
-    labels:
-      version: v2-mysql
-  - name: v2-mysql-vm
-    labels:
-      version: v2-mysql-vm
----
-apiVersion: networking.istio.io/v1
-kind: DestinationRule
-metadata:
-  name: details
-spec:
-  host: details
-  trafficPolicy:
-    tls:
-      mode: ISTIO_MUTUAL
-  subsets:
-  - name: v1
-    labels:
-      version: v1
----
-#Gateway
-
-apiVersion: networking.istio.io/v1
-kind: Gateway
-metadata:
-  name: bookinfo-gateway
-spec:
-  # The selector matches the ingress gateway pod labels.
-  # If you installed Istio using Helm following the standard documentation, this would be "istio=ingress"
-  selector:
-    istio: ingressgateway # use istio default controller
-  servers:
-  - port:
-      number: 8080
-      name: http
-      protocol: HTTP
-    hosts:
-    - "*"
----
-apiVersion: networking.istio.io/v1
-kind: VirtualService
-metadata:
-  name: bookinfo
-spec:
-  hosts:
-  - "*"
-  gateways:
-  - bookinfo-gateway
-  http:
-  - match:
-    - uri:
-        exact: /productpage
-    - uri:
-        prefix: /static
-    - uri:
-        exact: /login
-    - uri:
-        exact: /logout
-    - uri:
-        prefix: /api/v1/products
-    route:
-    - destination:
-        host: productpage
-        port:
-          number: 9080
 ---
 # Mesh-wide mTLS enforcement — rejects all plain-text traffic between sidecars
 apiVersion: security.istio.io/v1beta1
@@ -463,70 +359,4 @@ spec:
   mtls:
     mode: STRICT
 
----
-apiVersion: networking.istio.io/v1
-kind: VirtualService
-metadata:
-  name: productpage
-spec:
-  hosts:
-  - productpage
-  http:
-  - route:
-    - destination:
-        host: productpage
-        subset: v1
----
-apiVersion: networking.istio.io/v1
-kind: VirtualService
-metadata:
-  name: reviews
-spec:
-  hosts:
-  - reviews
-  http:
-  - route:
-    - destination:
-        host: reviews
-        subset: v1
-      weight: 33
-    - destination:
-        host: reviews
-        subset: v3
-      weight: 33
-    - destination:
-        host: reviews
-        subset: v2
-      weight: 34
----
-apiVersion: networking.istio.io/v1
-kind: VirtualService
-metadata:
-  name: ratings
-spec:
-  hosts:
-  - ratings
-  http:
-  - fault:
-      delay:
-        fixedDelay: 7s
-        percentage:
-          value: 100
-    route:
-    - destination:
-        host: ratings
-        subset: v1
----
-apiVersion: networking.istio.io/v1
-kind: VirtualService
-metadata:
-  name: details
-spec:
-  hosts:
-  - details
-  http:
-  - route:
-    - destination:
-        host: details
-        subset: v1
 ---
