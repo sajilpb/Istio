@@ -12,6 +12,19 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: default
+  ignoreDifferences:
+  - group: networking.istio.io
+    kind: VirtualService
+    name: ratings
+    namespace: default
+    jqPathExpressions:
+    - .spec.http[]?.route[]?.weight
+  - group: networking.istio.io
+    kind: DestinationRule
+    name: ratings
+    namespace: default
+    jqPathExpressions:
+    - .spec.subsets[]?.labels."rollouts-pod-template-hash"
   syncPolicy:
     automated:
       prune: true   
