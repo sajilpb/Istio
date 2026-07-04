@@ -69,11 +69,11 @@ spec:
   - ratings
   http:
   - name: primary
-    fault:
-      delay:
-        fixedDelay: 2s
-        percentage:
-          value: 100
+    # fault:
+    #   delay:
+    #     fixedDelay: 2s
+    #     percentage:
+    #       value: 100
     route:
     - destination:
         host: ratings
