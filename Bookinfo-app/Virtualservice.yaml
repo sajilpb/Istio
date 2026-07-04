@@ -68,17 +68,12 @@ spec:
   hosts:
   - ratings
   http:
-  - match:
-    - headers:
-        end-user:
-          exact: jason
+  - name: primary
     fault:
       delay:
-        percentage:
-          value: 100.0
         fixedDelay: 7s
-        
-  - name: primary
+        percentage:
+          value: 100
     route:
     - destination:
         host: ratings
@@ -88,6 +83,7 @@ spec:
         host: ratings
         subset: canary
       weight: 0
+    
 ---
 apiVersion: networking.istio.io/v1
 kind: VirtualService
