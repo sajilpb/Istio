@@ -71,7 +71,7 @@ spec:
   - name: primary
     fault:
       delay:
-        fixedDelay: 7s
+        fixedDelay: 2s
         percentage:
           value: 100
     route:
