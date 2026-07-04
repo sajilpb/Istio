@@ -23,8 +23,8 @@ spec:
     kind: DestinationRule
     name: ratings
     namespace: default
-    jqPathExpressions:
-    - .spec.subsets[]?.labels."rollouts-pod-template-hash"
+    managedFieldsManagers:
+    - rollouts-controller
   syncPolicy:
     automated:
       prune: true   

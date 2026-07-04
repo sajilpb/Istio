@@ -68,6 +68,16 @@ spec:
   hosts:
   - ratings
   http:
+  - match:
+    - headers:
+        end-user:
+          exact: jason
+    fault:
+      delay:
+        percentage:
+          value: 100.0
+        fixedDelay: 7s
+        
   - name: primary
     route:
     - destination:
