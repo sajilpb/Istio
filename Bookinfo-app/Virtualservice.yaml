@@ -70,8 +70,8 @@ spec:
   http:
   - name: primary
     fault:
-      delay:
-        fixedDelay: 8s
+      abort:
+        httpStatus: 500
         percentage:
           value: 100
     route:
