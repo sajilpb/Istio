@@ -102,30 +102,6 @@ metadata:
     account: ratings
 ---
 apiVersion: argoproj.io/v1alpha1
-kind: AnalysisTemplate
-metadata:
-  name: ratings-http-5xx
-spec:
-  args:
-  - name: service-name
-    value: ratings.default.svc.cluster.local
-  metrics:
-  - name: http-5xx-rate
-    interval: 1m
-    count: 5
-    failureLimit: 1
-    successCondition: result[0] < 0.05
-    provider:
-      prometheus:
-        address: http://prometheus.istio-system.svc.cluster.local:9090
-        query: |
-          (
-            sum(rate(istio_requests_total{destination_service=~"{{args.service-name}}",reporter="destination",response_code=~"5.."}[1m]))
-            /
-            sum(rate(istio_requests_total{destination_service=~"{{args.service-name}}",reporter="destination"}[1m]))
-          ) or on() vector(0)
----
-apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
   name: ratings-v1
