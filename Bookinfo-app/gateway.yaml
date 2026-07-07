@@ -1,16 +1,28 @@
+# Istio networking API version used by this resource.
 apiVersion: networking.istio.io/v1
+# Kubernetes resource kind.
 kind: Gateway
+# Standard object metadata block.
 metadata:
+  # Unique name of this Gateway resource in the namespace.
   name: bookinfo-gateway
+# Desired configuration for the Gateway.
 spec:
-  # The selector matches the ingress gateway pod labels.
-  # If you installed Istio using Helm following the standard documentation, this would be "istio=ingress"
+  # Selects the ingress gateway workload that should realize this config.
   selector:
-    istio: ingressgateway # use istio default controller
+    # Match the default Istio ingress gateway pods by label.
+    istio: ingressgateway
+  # List of listeners exposed by this Gateway.
   servers:
+  # Single HTTP listener definition.
   - port:
+      # External port that the gateway listens on.
       number: 8080
+      # Logical port name used by Istio.
       name: http
+      # Application protocol accepted on this port.
       protocol: HTTP
+    # Hostnames this listener will accept.
     hosts:
+    # Wildcard host means accept requests for any Host header.
     - "*"

@@ -76,6 +76,13 @@ spec:
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 9080
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
 ---
 ##################################################################################################
 # Ratings service
@@ -152,6 +159,13 @@ spec:
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 9080
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
 ---
 ##################################################################################################
 # Reviews service
@@ -211,6 +225,13 @@ spec:
           mountPath: /tmp
         - name: wlp-output
           mountPath: /opt/ibm/wlp/output
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
       volumes:
       - name: wlp-output
         emptyDir: {}
@@ -251,6 +272,13 @@ spec:
           mountPath: /tmp
         - name: wlp-output
           mountPath: /opt/ibm/wlp/output
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
       volumes:
       - name: wlp-output
         emptyDir: {}
@@ -291,6 +319,13 @@ spec:
           mountPath: /tmp
         - name: wlp-output
           mountPath: /opt/ibm/wlp/output
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
       volumes:
       - name: wlp-output
         emptyDir: {}
@@ -354,10 +389,137 @@ spec:
         volumeMounts:
         - name: tmp
           mountPath: /tmp
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
       volumes:
       - name: tmp
         emptyDir: {}
 
+---
+# HPA for details-v1 Deployment
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: details-v1-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: details-v1
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+---
+# HPA for ratings-v1 Rollout
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ratings-v1-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: argoproj.io/v1alpha1
+    kind: Rollout
+    name: ratings-v1
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+---
+# HPA for reviews-v1 Deployment
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: reviews-v1-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: reviews-v1
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+---
+# HPA for reviews-v2 Deployment
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: reviews-v2-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: reviews-v2
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+---
+# HPA for reviews-v3 Deployment
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: reviews-v3-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: reviews-v3
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+---
+# HPA for productpage-v1 Deployment
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: productpage-v1-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: productpage-v1
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
 ---
 # Mesh-wide mTLS enforcement — rejects all plain-text traffic between sidecars
 apiVersion: security.istio.io/v1beta1
