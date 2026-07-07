@@ -1,0 +1,95 @@
+# KEDA autoscaling for reviews-v1 (CPU + RPS)
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: reviews-v1-scaledobject
+spec:
+  scaleTargetRef:
+    name: reviews-v1
+  minReplicaCount: 1
+  maxReplicaCount: 5
+  pollingInterval: 30
+  cooldownPeriod: 180
+  triggers:
+  - type: cpu
+    metricType: Utilization
+    metadata:
+      value: "70"
+  - type: prometheus
+    metricType: AverageValue
+    metadata:
+      serverAddress: http://prometheus.istio-system.svc.cluster.local:9090
+      metricName: reviews_v1_rps
+      threshold: "5"
+      query: |
+        sum(
+          rate(istio_requests_total{
+            reporter="destination",
+            destination_workload_namespace="default",
+            destination_workload="reviews-v1"
+          }[1m])
+        )
+---
+# KEDA autoscaling for reviews-v2 (CPU + RPS)
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: reviews-v2-scaledobject
+spec:
+  scaleTargetRef:
+    name: reviews-v2
+  minReplicaCount: 1
+  maxReplicaCount: 5
+  pollingInterval: 30
+  cooldownPeriod: 180
+  triggers:
+  - type: cpu
+    metricType: Utilization
+    metadata:
+      value: "70"
+  - type: prometheus
+    metricType: AverageValue
+    metadata:
+      serverAddress: http://prometheus.istio-system.svc.cluster.local:9090
+      metricName: reviews_v2_rps
+      threshold: "5"
+      query: |
+        sum(
+          rate(istio_requests_total{
+            reporter="destination",
+            destination_workload_namespace="default",
+            destination_workload="reviews-v2"
+          }[1m])
+        )
+---
+# KEDA autoscaling for reviews-v3 (CPU + RPS)
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: reviews-v3-scaledobject
+spec:
+  scaleTargetRef:
+    name: reviews-v3
+  minReplicaCount: 1
+  maxReplicaCount: 5
+  pollingInterval: 30
+  cooldownPeriod: 180
+  triggers:
+  - type: cpu
+    metricType: Utilization
+    metadata:
+      value: "70"
+  - type: prometheus
+    metricType: AverageValue
+    metadata:
+      serverAddress: http://prometheus.istio-system.svc.cluster.local:9090
+      metricName: reviews_v3_rps
+      threshold: "5"
+      query: |
+        sum(
+          rate(istio_requests_total{
+            reporter="destination",
+            destination_workload_namespace="default",
+            destination_workload="reviews-v3"
+          }[1m])
+        )
